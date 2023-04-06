@@ -129,7 +129,7 @@ Implementing Federated Learning Code Based on UFormer
         -This way, the mean will be smaller than the actual value, but because MAE does not need to do loss, it will not affect the model fitting, but the previous MAE has no reference value
     -PSNR signal-to-noise ratio or image quality?
         -The calculation function is provided in the source code, so it is added
- -Structure Introduction
+    -Structure Introduction
     -Server side
         -Open multiple Clinets for training
         -By default, open 16 clients and select any 4 of them for iteration
@@ -201,7 +201,7 @@ Implementing Federated Learning Code Based on UFormer
                        - server*epoch*mean*MAE*evl
                        - server*epoch*mean*MSE*evl
                        - server*epoch*mean*PSNR*evl
-#Using Documents
+# Using Documents
     - train
         - nohup python server.py & 
         -All parameters are annotated in options. py
