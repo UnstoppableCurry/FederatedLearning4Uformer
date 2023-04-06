@@ -5,6 +5,8 @@ Implementing Federated Learning Code Based on UFormer
 ![2c2cb69123c9eead582f7d11e23fb44](https://user-images.githubusercontent.com/65523997/230285582-37389d03-6b10-4102-a811-b422170646e6.png)
 ![62689809b018872c6f72991a3c4d20c](https://user-images.githubusercontent.com/65523997/230285716-83e9e0d2-cef5-421c-989b-8d287e1cc615.png)
 ![f05ab04945f578be088f5f5d8929d41](https://user-images.githubusercontent.com/65523997/230285885-74f2fb85-0219-431a-8628-dfd39a25a2f1.png)
+![8af13059ac5b1018878b1bbe70427fc](https://user-images.githubusercontent.com/65523997/230286163-c624ac2e-9493-46a5-af22-e742fa69b811.png)
+
 
 
 目前项目支持tensorboard可视化全部评估结果,并支持在不同机器上面运行. 拟合性能经过验证到达通信次数1000次范围时模型收敛SOTA~
