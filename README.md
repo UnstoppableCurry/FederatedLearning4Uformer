@@ -1,6 +1,7 @@
 # FederatedLearning4Uformer
 Implementing Federated Learning Code Based on UFormer
 # 联邦
+![b70007e68189330103ccfba2a578fe2](https://user-images.githubusercontent.com/65523997/230284540-c3130e7b-3d3a-4db5-84b1-6bba8fb6547c.png)
 
 - 评估指标
     - RMSE 
