@@ -119,102 +119,102 @@ Implementing Federated Learning Code Based on UFormer
 
 #Federal
 -Evaluation indicators
-- RMSE 
--Source Code - Unchanged
--Tensorboard corresponding name MSE
--MAE relative error
--When implementing the code, it was found that when the model was not fitted, there would be overflow of NAN and INF values in the calculation, which would directly result in an error and prevent calculation In order to calculate, only elements that can be removed can be replaced with 0, which will disrupt the calculation of the original shape and relative error
--This way, the mean will be smaller than the actual value, but because MAE does not need to do loss, it will not affect the model fitting, but the previous MAE has no reference value
--PSNR signal-to-noise ratio or image quality?
--The calculation function is provided in the source code, so it is added
--Structure Introduction
--Server side
--Open multiple Clinets for training
--By default, open 16 clients and select any 4 of them for iteration
--The number of clientets cannot be greater than the number of graphics cards, which means that the current server only allows the number of clients to be enabled, which cannot be greater than 4
--Parallel training is implemented using multiple processes, which is different from the API of data parallelism and model parallelism. Therefore, it can only run according to the specified logic. It is difficult to solve the logic exception of loading multiple clients on a single card and then parallelizing multiple cards. Additionally, the batch size of a single card is limited greatly. It is recommended to switch to a machine with more cards to solve this problem
--After the client training is completed, it will be merged and averaged on the server for evaluation. All parameters will be aggregated on the cuda: 0 device (cannot be changed)
--Clinet client
--Each NEPOCH on the client will be evaluated on the validation set
--Each batch in the train calculates metrics and plots them in the Tensorboard, but there is no mean value
--During each evaluation, the indicators for each batch will be plotted along with the mean of each indicator in this evaluation
-- data
--Restricted multi process implementation for parallel training, the numworker parameter in the dataloader can only be set to 0. Any number greater than 0 will cause resource grabbing deadlock, and the program will not report errors or hang up, but will stop the calculation of the graphics card
--The parameter (less than or equal to 4) is not recommended when the data grouping has been fixed for uneven distribution but there are too few clients
--The training set and validation set are independent of each other, with a score of 8.2 and no repetition
--Script Run
--Currently, only an editor can be used to remotely run. The server's nohub command can cause errors that cannot be resolved
--Currently, the two versions of server.py are multithreaded versions that run without issues. Using server * for multi process implementation may result in a probability of deadlock. It is not recommended to use*
--Model Training and Saving
--At the beginning of each set of parameter training, different model save paths must be set to differentiate the model path
--When saving, both the tensorboard and model save paths will be in the savepath path
--Without early-stopping, manually comparing the optimal communication times to select the optimal model is sufficient
--Save one model per communication
-- tensorboard
-- client
--Naming Rule Prefix
--Each client+ID+Nth communication
--If client 0 is selected with its ID of client0 during the first communication, the 0 th communication
--If client 0 is not selected until the 5th communication after the 1st communication, its ID is client0 for the 5th communication
--Drawing requires downloading CVS data and manual proofreading times
--Train suffix naming rules
--The horizontal axis X represents the step, and each batch size step count directly represents each step
-- train*each*MAE
--Relative error
-- train*each*MSE
--Root mean square error
-- train*each*PSNR
--Signal-to-noise ratio
-- train*epoch*
--Times are meaningless
--Verify test suffix rules
-- test*MAE*Loss
--Ditto
-- test*MSE*Loss
--Ditto
-- test*PSNR*Loss
--Ditto
-- test*epoch*eval*MAE*
--Horizontal coordinate x per epoch
--The vertical axis is the same as above
-- test*epoch*eval*MSEc*
--Horizontal coordinate x per epoch
--The vertical axis is the same as above
-- test*epoch*eval*psnr*
--Horizontal coordinate x per epoch
--The vertical axis is the same as above
-- server
--Naming Rule Prefix
-- server
--Verify suffix rules
--Every time
--The x-axis represents the number of server side verifications independent of the communication count (communication is not reset)
-- server*eval*each*MAE*LOSS
-- server*eval*each*MSE*LOSS
-- server*eval*each*PSNR*LOSS
--Same vertical axis as above
--Each round
--The horizontal axis x represents the number of communications
--The vertical axis is the mean value of this degree
-- server*epoch*mean*MAE*evl
-- server*epoch*mean*MSE*evl
-- server*epoch*mean*PSNR*evl
+    - RMSE 
+        -Source Code - Unchanged
+        -Tensorboard corresponding name MSE
+    -MAE relative error
+        -When implementing the code, it was found that when the model was not fitted, there would be overflow of NAN and INF values in the calculation, which would directly result in an error and prevent calculation In order to calculate, only elements that can be removed can be replaced with 0, which will disrupt the calculation of the original shape and relative error
+        -This way, the mean will be smaller than the actual value, but because MAE does not need to do loss, it will not affect the model fitting, but the previous MAE has no reference value
+    -PSNR signal-to-noise ratio or image quality?
+        -The calculation function is provided in the source code, so it is added
+ -Structure Introduction
+    -Server side
+        -Open multiple Clinets for training
+        -By default, open 16 clients and select any 4 of them for iteration
+        -The number of clientets cannot be greater than the number of graphics cards, which means that the current server only allows the number of clients to be enabled, which cannot be greater than 4
+        -Parallel training is implemented using multiple processes, which is different from the API of data parallelism and model parallelism. Therefore, it can only run according to the specified logic. It is difficult to solve the logic exception of loading multiple clients on a single card and then parallelizing multiple cards. Additionally, the batch size of a single card is limited greatly. It is recommended to switch to a machine with more cards to solve this problem
+        -After the client training is completed, it will be merged and averaged on the server for evaluation. All parameters will be aggregated on the cuda: 0 device (cannot be changed)
+    -Clinet client
+        -Each NEPOCH on the client will be evaluated on the validation set
+        -Each batch in the train calculates metrics and plots them in the Tensorboard, but there is no mean value
+        -During each evaluation, the indicators for each batch will be plotted along with the mean of each indicator in this evaluation
+    - data
+        -Restricted multi process implementation for parallel training, the numworker parameter in the dataloader can only be set to 0. Any number greater than 0 will cause resource grabbing deadlock, and the program will not report errors or hang up, but will stop the calculation of the graphics card
+        -The parameter (less than or equal to 4) is not recommended when the data grouping has been fixed for uneven distribution but there are too few clients
+        -The training set and validation set are independent of each other, with a score of 8.2 and no repetition
+    -Script Run
+        -Currently, only an editor can be used to remotely run. The server's nohub command can cause errors that cannot be resolved
+        -Currently, the two versions of server.py are multithreaded versions that run without issues. Using server * for multi process implementation may result in a probability of deadlock. It is not recommended to use*
+    -Model Training and Saving
+        -At the beginning of each set of parameter training, different model save paths must be set to differentiate the model path
+        -When saving, both the tensorboard and model save paths will be in the savepath path
+        -Without early-stopping, manually comparing the optimal communication times to select the optimal model is sufficient
+        -Save one model per communication
+    - tensorboard
+        - client
+            -Naming Rule Prefix
+                -Each client+ID+Nth communication
+                -If client 0 is selected with its ID of client0 during the first communication, the 0 th communication
+                -If client 0 is not selected until the 5th communication after the 1st communication, its ID is client0 for the 5th communication
+                -Drawing requires downloading CVS data and manual proofreading times
+            -Train suffix naming rules
+                -The horizontal axis X represents the step, and each batch size step count directly represents each step
+                - train*each*MAE
+                    -Relative error
+                - train*each*MSE
+                    -Root mean square error
+                - train*each*PSNR
+                    -Signal-to-noise ratio
+                - train*epoch*
+                    -Times are meaningless
+            -Verify test suffix rules
+                - test*MAE*Loss
+                    -Ditto
+                - test*MSE*Loss
+                    -Ditto
+                - test*PSNR*Loss
+                    -Ditto
+                - test*epoch*eval*MAE*
+                    -Horizontal coordinate x per epoch
+                    -The vertical axis is the same as above
+                - test*epoch*eval*MSEc*
+                    -Horizontal coordinate x per epoch
+                    -The vertical axis is the same as above
+                - test*epoch*eval*psnr*
+                    -Horizontal coordinate x per epoch
+                    -The vertical axis is the same as above
+            - server
+                -Naming Rule Prefix
+                    - server
+                -Verify suffix rules
+                    -Every time
+                        -The x-axis represents the number of server side verifications independent of the communication count (communication is not reset)
+                        - server*eval*each*MAE*LOSS
+                       - server*eval*each*MSE*LOSS
+                       - server*eval*each*PSNR*LOSS
+                       -Same vertical axis as above
+                       -Each round
+                       -The horizontal axis x represents the number of communications
+                       -The vertical axis is the mean value of this degree
+                       - server*epoch*mean*MAE*evl
+                       - server*epoch*mean*MSE*evl
+                       - server*epoch*mean*PSNR*evl
 #Using Documents
-- train
-- nohup python server.py & 
--All parameters are annotated in options. py
--Note that the save * path parameter is used to save the model file and tensorboard file*
--View Training Log
-- tail -f nohup.out
-- test
-- python test.py  
--The parameters need to be configured with the test set path and save path in the file. Before running, clear all mat files in the corresponding save path folder first
--Default Save Path `/home/hyzb/user_ wanghongzhou/SR_ Test/results/ `
-- input
-- denoiseing
--Visualization commands
--Tensorboard -- logdir=Your path
--Your path corresponds to save * path*
--Open the browser to access ip: 6006
--1000 correct result file paths
-- `/home/hyzb/user_ wanghongzhou/SR_ Test/right_ resume_ False_ num_ comm_ 2000_ client_ 16_ gpuclient_ 4_ batchsize_ 14_ nepoch_ 1_ IID_ False_ Neo equidistant_ warmup_ True`
+    - train
+        - nohup python server.py & 
+        -All parameters are annotated in options. py
+        -Note that the save * path parameter is used to save the model file and tensorboard file*
+    -View Training Log
+        - tail -f nohup.out
+    - test
+        - python test.py  
+        -The parameters need to be configured with the test set path and save path in the file. Before running, clear all mat files in the corresponding save path folder first
+        -Default Save Path `/home/hyzb/user_ wanghongzhou/SR_ Test/results/ `
+        - input
+        - denoiseing
+    -Visualization commands
+        -Tensorboard -- logdir=Your path
+        -Your path corresponds to save * path*
+        -Open the browser to access ip: 6006
+        -1000 correct result file paths
+        - `/home/hyzb/user_ wanghongzhou/SR_ Test/right_ resume_ False_ num_ comm_ 2000_ client_ 16_ gpuclient_ 4_ batchsize_ 14_ nepoch_ 1_ IID_ False_ Neo equidistant_ warmup_ True`
