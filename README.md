@@ -2,6 +2,7 @@
 Implementing Federated Learning Code Based on UFormer
 # 联邦
 ![b70007e68189330103ccfba2a578fe2](https://user-images.githubusercontent.com/65523997/230284540-c3130e7b-3d3a-4db5-84b1-6bba8fb6547c.png)
+目前项目支持tensorboard可视化全部评估结果,并支持在不同机器上面运行. 拟合性能经过验证到达通信次数1000次范围时模型收敛SOTA~
 
 - 评估指标
     - RMSE 
@@ -86,7 +87,8 @@ Implementing Federated Learning Code Based on UFormer
                     - server*epoch*mean*PSNR*evl
 
 # 使用文档
-
+![68b2b5d69fe6ce6e27a098cf362e69b](https://user-images.githubusercontent.com/65523997/230284811-4997114a-1d36-4de7-8f7b-21471f180415.png)
+- 目前训练机器为4 x v100 32G  显卡越多加速越快
 - train
     - nohup python server.py & 
     - 所有参数都在options.py 中 均有注释
