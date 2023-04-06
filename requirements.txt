@@ -13,3 +13,4 @@ linformer
 timm
 ptflops
 dataclasses
+tensorboard
