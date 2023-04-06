@@ -120,8 +120,8 @@ Implementing Federated Learning Code Based on UFormer
 #Federal
 -Evaluation indicators
     - RMSE 
-        -Source Code - Unchanged
-        -Tensorboard corresponding name MSE
+        - Source Code - Unchanged
+        - Tensorboard corresponding name MSE
     -MAE relative error
         -When implementing the code, it was found that when the model was not fitted, there would be overflow of NAN and INF values in the calculation, which would directly result in an error and prevent calculation In order to calculate, only elements that can be removed can be replaced with 0, which will disrupt the calculation of the original shape and relative error
         -This way, the mean will be smaller than the actual value, but because MAE does not need to do loss, it will not affect the model fitting, but the previous MAE has no reference value
