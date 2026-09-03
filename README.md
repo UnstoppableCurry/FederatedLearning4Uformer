@@ -1,5 +1,7 @@
 # FederatedLearning4Uformer
 Implementing Federated Learning Code Based on UFormer
+
+📄 **研究展示页（GitHub Pages）**：[https://unstoppablecurry.github.io/FederatedLearning4Uformer/](https://unstoppablecurry.github.io/FederatedLearning4Uformer/) — 静态汇总 README 所载联邦设定、实验图示与已知限制（无法在浏览器中训练）。
 # 联邦 ZH
 ![b70007e68189330103ccfba2a578fe2](https://user-images.githubusercontent.com/65523997/230284540-c3130e7b-3d3a-4db5-84b1-6bba8fb6547c.png)
 ![2c2cb69123c9eead582f7d11e23fb44](https://user-images.githubusercontent.com/65523997/230285582-37389d03-6b10-4102-a811-b422170646e6.png)

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FederatedLearning4Uformer — 联邦学习与 Uformer 图像复原研究展示</title>
+  <meta name="description" content="基于 Uformer 的联邦学习图像去噪实现。展示研究背景、联邦训练流程、README 所载实验结果与已知限制。本页为静态展示，无法在浏览器中训练。">
+  <meta name="keywords" content="联邦学习,Federated Learning,Uformer,图像去噪,SIDD,TensorBoard">
+  <meta name="author" content="UnstoppableCurry">
+  <link rel="canonical" href="https://unstoppablecurry.github.io/FederatedLearning4Uformer/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="FederatedLearning4Uformer — 联邦学习与 Uformer 研究展示">
+  <meta property="og:description" content="基于 Uformer 的联邦学习图像去噪实现。README 所载架构、训练结果与限制说明。">
+  <meta property="og:url" content="https://unstoppablecurry.github.io/FederatedLearning4Uformer/">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:image" content="https://unstoppablecurry.github.io/FederatedLearning4Uformer/assets/result-03.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FederatedLearning4Uformer">
+  <meta name="twitter:description" content="基于 Uformer 的联邦学习图像去噪 — 静态研究展示">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳至主要内容</a>
+
+  <header class="site-header">
+    <div class="container">
+      <p class="eyebrow">Research Showcase · 静态展示</p>
+      <h1>FederatedLearning4Uformer</h1>
+      <p class="lead">
+        基于 <a href="https://arxiv.org/abs/2106.03106" rel="noopener noreferrer">Uformer</a> 的联邦学习图像复原实现。
+        本页面汇总仓库 README 与源码中<strong>已记载</strong>的研究设定、训练流程与实验图示；<strong>无法在浏览器中运行或训练</strong>。
+      </p>
+      <div class="header-actions">
+        <a class="btn btn-primary" href="https://github.com/UnstoppableCurry/FederatedLearning4Uformer" rel="noopener noreferrer">GitHub 仓库</a>
+        <a class="btn btn-secondary" href="#results">查看实验图示</a>
+        <a class="btn btn-secondary" href="#limitations">已知限制</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="toc" role="navigation" aria-label="页面目录">
+    <div class="container">
+      <nav>
+        <a href="#problem">研究问题</a>
+        <a href="#federated">联邦设定</a>
+        <a href="#model">模型与流程</a>
+        <a href="#metrics">评估指标</a>
+        <a href="#results">实验图示</a>
+        <a href="#limitations">限制说明</a>
+        <a href="#usage">运行方式</a>
+        <a href="#references">引用与来源</a>
+      </nav>
+    </div>
+  </div>
+
+  <main id="main" class="container">
+    <section id="problem" aria-labelledby="problem-heading">
+      <h2 id="problem-heading">研究问题</h2>
+      <p>
+        本仓库将 <strong>Uformer</strong>（通用 U 型 Transformer 图像复原网络）扩展至<strong>联邦学习</strong>场景，
+        在数据分布于多个客户端、无法集中上传的前提下，通过服务端聚合实现协同训练。
+      </p>
+      <div class="card-grid">
+        <article class="card">
+          <h3>基础模型</h3>
+          <p>Uformer 面向图像去噪等低层视觉任务，采用局部增强窗口 Transformer 与跳跃连接设计。</p>
+          <span class="source">来源：<code>README.md</code> 标题；<code>model.py</code> 文件头注释（引用 arXiv:2106.03106）</span>
+        </article>
+        <article class="card">
+          <h3>任务模式</h3>
+          <p>默认配置为图像去噪（<code>mode=denoising</code>），数据集默认为 <strong>SIDD</strong>。</p>
+          <span class="source">来源：<code>options.py</code> — <code>dataset</code>、<code>mode</code> 默认值</span>
+        </article>
+        <article class="card">
+          <h3>README 收敛描述</h3>
+          <p>README 记载：拟合性能经验证，在通信次数约 <strong>1000 次</strong>范围内模型收敛至 SOTA 水平（原文表述，未给出具体数值指标）。</p>
+          <span class="source">来源：<code>README.md</code> 第 12 行 — 作者自述，非独立基准测试报告</span>
+        </article>
+      </div>
+      <div class="callout callout-warning">
+        <strong>说明</strong>
+        本展示页不收录任何 README / 源码未记载的论文发表状态、对比实验表格或精确 SOTA 数值。
+        Uformer 原论文在 SIDD 上的 PSNR 等指标见 <code>sr/README.md</code>，与本仓库联邦实验为不同设定。
+      </div>
+    </section>
+
+    <section id="federated" aria-labelledby="federated-heading">
+      <h2 id="federated-heading">联邦学习设定</h2>
+      <p>以下参数与行为均来自 <code>options.py</code> 默认值及 <code>server.py</code> / <code>README.md</code> 描述。</p>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">联邦学习默认超参数</caption>
+          <thead>
+            <tr>
+              <th scope="col">配置项</th>
+              <th scope="col">默认值</th>
+              <th scope="col">说明</th>
+              <th scope="col">来源</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>客户端总数</td>
+              <td><code>16</code></td>
+              <td><code>num_of_clients</code></td>
+              <td><code>options.py</code></td>
+            </tr>
+            <tr>
+              <td>每轮参与比例</td>
+              <td><code>0.25</code></td>
+              <td>每轮随机选取 4 个客户端（<code>cfraction</code>）</td>
+              <td><code>options.py</code>；<code>README.md</code></td>
+            </tr>
+            <tr>
+              <td>通信轮次</td>
+              <td><code>2000</code></td>
+              <td><code>num_comm</code>；README 另提及约 1000 次收敛</td>
+              <td><code>options.py</code>；<code>README.md</code></td>
+            </tr>
+            <tr>
+              <td>数据划分</td>
+              <td>训练 : 验证 = 8 : 2</td>
+              <td>互不重复、相互独立</td>
+              <td><code>README.md</code></td>
+            </tr>
+            <tr>
+              <td>采样方式</td>
+              <td><code>IID=-1</code></td>
+              <td>随机采样等差分布（注释说明）</td>
+              <td><code>options.py</code></td>
+            </tr>
+            <tr>
+              <td>聚合策略</td>
+              <td>参数均值</td>
+              <td><code>sr_weight=1</code> 时对参与客户端参数取平均</td>
+              <td><code>server.py</code> L264–277</td>
+            </tr>
+            <tr>
+              <td>GPU 约束</td>
+              <td>≤ 4</td>
+              <td>客户端数量不能大于显卡数量；README 记载训练机为 4×V100 32G</td>
+              <td><code>README.md</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>服务端—客户端流程</h3>
+      <div class="pipeline" role="img" aria-label="联邦训练流程：服务端下发全局参数，随机选取客户端本地训练，客户端上传参数，服务端取均值聚合，在验证集评估并记录 TensorBoard">
+        <span class="pipeline-step">Server 下发全局参数</span>
+        <span class="pipeline-arrow" aria-hidden="true">→</span>
+        <span class="pipeline-step">随机选取客户端（默认 4/16）</span>
+        <span class="pipeline-arrow" aria-hidden="true">→</span>
+        <span class="pipeline-step">各 Client 本地训练</span>
+        <span class="pipeline-arrow" aria-hidden="true">→</span>
+        <span class="pipeline-step">上传参数 · 服务端取均值</span>
+        <span class="pipeline-arrow" aria-hidden="true">→</span>
+        <span class="pipeline-step">验证集评估 · TensorBoard 记录</span>
+      </div>
+      <span class="source">来源：<code>server.py</code> 通信循环与聚合逻辑；<code>README.md</code> 结构介绍</span>
+
+      <h3>并行实现</h3>
+      <ul>
+        <li>推荐版本：<code>server.py</code>（多线程），README 记载运行无问题。</li>
+        <li><code>server_Multiprocess.py</code>：多进程实现，README 记载有概率死锁，不建议使用。</li>
+        <li>聚合与评估在 <code>cuda:0</code> 上进行（README 记载不可更改设备）。</li>
+        <li><code>DataLoader</code> 的 <code>num_workers</code> 必须为 <code>0</code>，否则可能死锁。</li>
+      </ul>
+      <span class="source">来源：<code>README.md</code>；<code>options.py</code> <code>train_workers</code>/<code>eval_workers</code> 默认 0</span>
+    </section>
+
+    <section id="model" aria-labelledby="model-heading">
+      <h2 id="model-heading">模型与训练管线</h2>
+
+      <div class="card-grid">
+        <article class="card">
+          <h3>网络架构</h3>
+          <p><code>arch=Uformer</code>，<code>embed_dim=32</code>，<code>win_size=8</code>，<code>train_ps=128</code>。</p>
+          <span class="source">来源：<code>options.py</code></span>
+        </article>
+        <article class="card">
+          <h3>优化与损失</h3>
+          <p>优化器 AdamW（<code>lr=2e-4</code>），损失函数 CharbonnierLoss，可选 warmup + cosine 学习率。</p>
+          <span class="source">来源：<code>options.py</code>；<code>server.py</code> L170–171</span>
+        </article>
+        <article class="card">
+          <h3>训练批次</h3>
+          <p><code>batch_size=14</code>，<code>nepoch=1</code>（每轮通信本地 epoch 数）。每通信一次保存一个模型，无 early stopping。</p>
+          <span class="source">来源：<code>options.py</code>；<code>README.md</code></span>
+        </article>
+      </div>
+
+      <h3>代码入口</h3>
+      <ul>
+        <li>联邦训练：<code>python server.py</code></li>
+        <li>测试推理：<code>python test.py</code>（需配置测试集与保存路径）</li>
+        <li>可视化：<code>tensorboard --logdir=&lt;save_path&gt;</code></li>
+      </ul>
+      <span class="source">来源：<code>README.md</code> 使用文档</span>
+    </section>
+
+    <section id="metrics" aria-labelledby="metrics-heading">
+      <h2 id="metrics-heading">评估指标</h2>
+      <p>README 记载本项目使用以下指标，并通过 TensorBoard 可视化全部评估结果：</p>
+      <ul>
+        <li><strong>RMSE</strong> — 源代码未更改；TensorBoard 中对应名称为 <code>MSE</code>。</li>
+        <li><strong>MAE</strong>（相对误差）— 模型未拟合时可能出现 NaN/Inf；实现中剔除异常值并以 0 替换，会破坏 shape 与相对误差计算，前期 MAE 无参考价值。</li>
+        <li><strong>PSNR</strong> — 源码提供计算函数，已纳入评估。</li>
+      </ul>
+      <span class="source">来源：<code>README.md</code> 评估指标章节</span>
+
+      <h3>TensorBoard 命名（节选）</h3>
+      <ul>
+        <li>服务端每轮均值：<code>server_epoch_mean_MSE_evl</code>、<code>server_epoch_mean_MAE_evl</code>、<code>server_epoch_mean_PSNR_evl</code></li>
+        <li>客户端验证：<code>test_MSE_Loss</code>、<code>test_MAE_Loss</code>、<code>test_PSNR_Loss</code> 等</li>
+      </ul>
+      <span class="source">来源：<code>README.md</code> TensorBoard 命名规则；<code>server.py</code> <code>add_scalar</code> 调用</span>
+    </section>
+
+    <section id="results" aria-labelledby="results-heading">
+      <h2 id="results-heading">实验图示</h2>
+      <p>
+        以下 5 张图为 <code>README.md</code> 所载用户附图（原托管于 GitHub user-images），
+        已本地化至 <code>docs/assets/</code>。图示仅作 README 实验记录展示，<strong>不附加未记载的数值结论</strong>。
+      </p>
+
+      <div class="figure-grid">
+        <figure>
+          <img src="assets/architecture-01.png"
+               alt="TensorBoard 曲线：server_epoch_mean_MSE_evl，横轴为通信轮次，纵轴为 MSE 评估值，曲线随轮次下降后趋于平稳"
+               width="747" height="516" loading="lazy">
+          <figcaption>
+            <strong>图示 1 — 服务端每轮平均 MSE 评估曲线</strong>
+            TensorBoard 标量 <code>server_epoch_mean_MSE_evl</code>。图中可见曲线在约 525 步处记录值约为 0.020（悬停提示，以原图为准）。
+            <span class="source">来源：README 第 1 张附图；对应 <code>server.py</code> TensorBoard 命名</span>
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img src="assets/result-01.png"
+               alt="TensorBoard 曲线：client15 第526次通讯 test MSE Loss，显示客户端单次通信内的批次 MSE 波动"
+               width="788" height="477" loading="lazy">
+          <figcaption>
+            <strong>图示 2 — 单客户端验证 MSE（第 526 次通信）</strong>
+            标题为 <code>client15第526次通讯_test_MSE_Loss</code>，展示该客户端在单次通信周期内的测试 MSE 批次波动。
+            <span class="source">来源：README 第 2 张附图</span>
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img src="assets/result-02.png"
+               alt="MATLAB 折线图：Friction coefficient 随 Sampling point 变化，蓝色实线为 Measured，红色点划线为 Reconstructed"
+               width="757" height="558" loading="lazy">
+          <figcaption>
+            <strong>图示 3 — MATLAB 实测与重构对比</strong>
+            图中 Y 轴为 Friction coefficient，X 轴为 Sampling point；图例区分 Measured（实测）与 Reconstructed（重构）。
+            README 未对该图实验背景作文字说明，此处仅转述图中可见信息。
+            <span class="source">来源：README 第 3 张附图</span>
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img src="assets/result-03.png"
+               alt="TensorBoard Scalars 面板，显示 client3、client8、client13 的 loss 曲线及 server 端 eval loss"
+               width="2560" height="1350" loading="lazy">
+          <figcaption>
+            <strong>图示 4 — TensorBoard 多客户端 Loss 面板</strong>
+            可见 <code>client3_loss</code>、<code>client8_loss</code>、<code>client13_loss</code> 及 <code>serve_eval_each_loss</code> 等标量曲线；
+            运行记录时间为 2023-02-13（图中任务栏显示）。
+            <span class="source">来源：README 第 4 张附图</span>
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img src="assets/result-04.png"
+               alt="三组 MATLAB 图：预测与真实数据的幅度谱、相位谱热力图对比，以及时域 Original 与 Reconstructed 信号曲线"
+               width="2078" height="655" loading="lazy">
+          <figcaption>
+            <strong>图示 5 — 频域与时域重构对比（MATLAB）</strong>
+            包含预测/真实幅度单边谱、相位单边谱及时域 Original vs. Reconstructed Signal 对比。
+            README 未对该图给出定量指标，仅作实验记录附图。
+            <span class="source">来源：README 第 5 张附图</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="callout">
+        <strong>README 记载的结果路径（示例）</strong>
+        1000 次通信对应的结果目录（服务器本地路径，非本 Pages 站点资源）：
+        <code>/home/hyzb/user_wanghongzhou/SR_Test/right_resume_False_num_comm_2000_client_16_gpuclient_4_batchsize_14_nepoch_1_IID_False_Neo等差_warmup_True</code>
+        <span class="source">来源：<code>README.md</code> L115–116</span>
+      </div>
+    </section>
+
+    <section id="limitations" aria-labelledby="limitations-heading">
+      <h2 id="limitations-heading">已知限制与注意事项</h2>
+      <p>以下内容均摘自 <code>README.md</code> 与源码注释，为仓库作者已披露的限制：</p>
+      <ul>
+        <li><strong>运行环境</strong>：目前仅能通过编辑器 Remote 运行；<code>nohup</code> 启动服务端会报错且无法解决。</li>
+        <li><strong>硬件</strong>：客户端数量不能大于 GPU 数量；单卡加载多客户端时 batch size 受限，多卡并行逻辑难以解决。</li>
+        <li><strong>数据加载</strong>：<code>num_workers &gt; 0</code> 会导致资源争抢死锁，程序不报错但 GPU 停止计算。</li>
+        <li><strong>客户端数量</strong>：数据分组已修复不均匀分配，但客户端过少（≤4）时不建议使用。</li>
+        <li><strong>MAE 指标</strong>：训练前期因 NaN/Inf 处理策略，MAE 可能低于实际值，前期无参考价值。</li>
+        <li><strong>模型选择</strong>：无 early stopping，需人工对比通信次数选择最优模型。</li>
+        <li><strong>本 Pages 站点</strong>：纯静态 HTML，无法在浏览器中执行 PyTorch 训练或联邦通信；完整复现需在本地/服务器按 README 配置环境。</li>
+      </ul>
+      <span class="source">来源：<code>README.md</code> 结构介绍与使用文档；<code>options.py</code></span>
+    </section>
+
+    <section id="usage" aria-labelledby="usage-heading">
+      <h2 id="usage-heading">本地运行概要</h2>
+      <ol>
+        <li>安装依赖：<code>pip install -r requirements.txt</code>（PyTorch 1.7.1 等，见 <code>requirements.txt</code>）</li>
+        <li>在 <code>options.py</code> 配置数据路径、<code>save_path</code>、GPU 等参数</li>
+        <li>启动联邦训练：<code>python server.py</code></li>
+        <li>查看日志：<code>tensorboard --logdir=&lt;save_path&gt;</code>，浏览器访问 <code>ip:6006</code></li>
+        <li>测试：<code>python test.py</code>，运行前清空目标保存目录中的 <code>.mat</code> 文件</li>
+      </ol>
+      <span class="source">来源：<code>README.md</code> 使用文档；<code>requirements.txt</code></span>
+    </section>
+
+    <section id="references" aria-labelledby="references-heading">
+      <h2 id="references-heading">引用与来源标注</h2>
+      <ul>
+        <li><strong>本仓库</strong>：<a href="https://github.com/UnstoppableCurry/FederatedLearning4Uformer">UnstoppableCurry/FederatedLearning4Uformer</a></li>
+        <li><strong>Uformer 原论文</strong>：Wang et al., <a href="https://arxiv.org/abs/2106.03106" rel="noopener noreferrer">arXiv:2106.03106</a>（<code>model.py</code> / <code>sr/README.md</code>）</li>
+        <li><strong>展示页内容范围</strong>：仅 <code>README.md</code>、<code>options.py</code>、<code>server.py</code>、<code>clients.py</code>、<code>requirements.txt</code> 等仓库内文件；未引用外部未验证结论</li>
+      </ul>
+      <p>
+        若发现展示内容与源码不一致，以 GitHub 仓库最新代码为准。
+        本页最后构建自分支 <code>cursor/github-pages-showcase-faea</code>。
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        &copy; FederatedLearning4Uformer ·
+        <a href="https://github.com/UnstoppableCurry/FederatedLearning4Uformer">源代码</a> ·
+        <a href="https://unstoppablecurry.github.io/FederatedLearning4Uformer/">本展示页</a>
+      </p>
+      <p>静态研究展示 — 不在浏览器中训练。内容均标注来源，不虚构实验数据。</p>
+    </div>
+  </footer>
+
+  <style>
+    /* Visually hidden caption for screen readers */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</body>
+</html>
